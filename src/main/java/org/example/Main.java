@@ -3,8 +3,8 @@ package org.example;
 public class Main {
 	public static void main(String[] args) {
 		AlgorithmService algorithmService = new AlgorithmService();
-		algorithmService.fillCriteriaMatrix(3);
-		algorithmService.fillAlternativeMatrix(3);
+		algorithmService.fillCriteriaMatrix(4);
+		algorithmService.fillAlternativeMatrix(5, 4);
 		algorithmService.printCriteriaMatrix();
 		algorithmService.printAlternativeMatrix();
 		algorithmService.calcQualityIndicator();

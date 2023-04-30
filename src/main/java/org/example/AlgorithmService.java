@@ -12,6 +12,7 @@ public class AlgorithmService {
 	private List<Double> scale;
 	private List<String> headersForCriteriaMatrix;
 	private List<String> headersForAlternativeMatrix;
+	private int amountOfCriteria;
 
 	public void fillCriteriaMatrix(int amountOfCriteria) {
 		fillScale();
@@ -35,14 +36,14 @@ public class AlgorithmService {
 
 	private void countOwnVectorForCriteria() {
 		for (int i = 0; i < criteriaMatrix.length; i++) {
-			criteriaMatrix[i][criteriaMatrix.length - 1].setOwnVector(Math.pow(criteriaMatrix[i][0].getValue() * criteriaMatrix[i][1].getValue() * criteriaMatrix[i][2].getValue(), 1.0 / criteriaMatrix.length));
+			criteriaMatrix[i][criteriaMatrix.length - 1].setOwnVector(Math.pow(criteriaMatrix[i][0].getValue() * criteriaMatrix[i][1].getValue() * criteriaMatrix[i][2].getValue() * criteriaMatrix[i][3].getValue(), 1.0 / criteriaMatrix.length));
 		}
 	}
 
 	private void countOwnVectorForAlternative() {
-		for (int k = 0; k < alternativeMatrix.length; k++) {
+		for (int k = 0; k < amountOfCriteria; k++) {
 			for (int i = 0; i < alternativeMatrix.length; i++) {
-				alternativeMatrix[k][i][alternativeMatrix.length - 1].setOwnVector(Math.pow(alternativeMatrix[k][i][0].getValue() * alternativeMatrix[k][i][1].getValue() * alternativeMatrix[k][i][2].getValue(), 1.0 / alternativeMatrix.length));
+				alternativeMatrix[k][i][alternativeMatrix.length - 1].setOwnVector(Math.pow(alternativeMatrix[k][i][0].getValue() * alternativeMatrix[k][i][1].getValue() * alternativeMatrix[k][i][2].getValue() * alternativeMatrix[k][i][3].getValue() * alternativeMatrix[k][i][4].getValue(), 1.0 / alternativeMatrix.length));
 			}
 		}
 	}
@@ -50,15 +51,15 @@ public class AlgorithmService {
 	private void countWeightOfCriteria() {
 		for (int i = 0; i < criteriaMatrix.length; i++) {
 			criteriaMatrix[i][criteriaMatrix.length - 1].setWeightOfCriteria(criteriaMatrix[i][criteriaMatrix.length - 1].getOwnVector() / (criteriaMatrix[0][criteriaMatrix.length - 1].getOwnVector() +
-					criteriaMatrix[1][criteriaMatrix.length - 1].getOwnVector() + criteriaMatrix[2][criteriaMatrix.length - 1].getOwnVector()));
+					criteriaMatrix[1][criteriaMatrix.length - 1].getOwnVector() + criteriaMatrix[2][criteriaMatrix.length - 1].getOwnVector() + criteriaMatrix[3][criteriaMatrix.length - 1].getOwnVector()));
 		}
 	}
 
 	private void countWeightOfAlternative() {
-		for (int k = 0; k < alternativeMatrix.length; k++) {
+		for (int k = 0; k < amountOfCriteria; k++) {
 			for (int i = 0; i < alternativeMatrix.length; i++) {
 				alternativeMatrix[k][i][alternativeMatrix.length - 1].setWeightOfCriteria(alternativeMatrix[k][i][alternativeMatrix.length - 1].getOwnVector() / (alternativeMatrix[k][0][alternativeMatrix.length - 1].getOwnVector() +
-						alternativeMatrix[k][1][criteriaMatrix.length - 1].getOwnVector() + alternativeMatrix[k][2][alternativeMatrix.length - 1].getOwnVector()));
+						alternativeMatrix[k][1][criteriaMatrix.length - 1].getOwnVector() + alternativeMatrix[k][2][alternativeMatrix.length - 1].getOwnVector() + alternativeMatrix[k][3][alternativeMatrix.length - 1].getOwnVector() + alternativeMatrix[k][4][alternativeMatrix.length - 1].getOwnVector()));
 			}
 		}
 	}
@@ -68,6 +69,8 @@ public class AlgorithmService {
 		headersForCriteriaMatrix.add("C1");
 		headersForCriteriaMatrix.add("C2");
 		headersForCriteriaMatrix.add("C3");
+		headersForCriteriaMatrix.add("C4");
+
 	}
 
 	private void fillHeadersForAlternativeMatrix() {
@@ -75,6 +78,9 @@ public class AlgorithmService {
 		headersForAlternativeMatrix.add("A1");
 		headersForAlternativeMatrix.add("A2");
 		headersForAlternativeMatrix.add("A3");
+		headersForAlternativeMatrix.add("A4");
+		headersForAlternativeMatrix.add("A5");
+
 	}
 
 	private Point compareCriteria() {
@@ -123,9 +129,10 @@ public class AlgorithmService {
 	}
 
 
-	public void fillAlternativeMatrix(int amountOfAlternative) {
-		alternativeMatrix = new Point[amountOfAlternative][amountOfAlternative][amountOfAlternative];
-		for (int k = 0; k < amountOfAlternative; k++) {
+	public void fillAlternativeMatrix(int amountOfAlternative, int amountOfCriteria) {
+		this.amountOfCriteria = amountOfCriteria;
+		alternativeMatrix = new Point[amountOfCriteria][amountOfAlternative][amountOfAlternative];
+		for (int k = 0; k < amountOfCriteria; k++) {
 			for (int i = 0; i < amountOfAlternative; i++) {
 				for (int j = 0; j < amountOfAlternative; j++) {
 
@@ -151,7 +158,7 @@ public class AlgorithmService {
 		decimalFormat.setMaximumFractionDigits(2);
 		decimalFormat.setMinimumFractionDigits(2);
 
-		for (int k = 0; k < alternativeMatrix.length; k++) {
+		for (int k = 0; k < amountOfCriteria; k++) {
 
 			printHeaderForAlternativeMatrix(k);
 
@@ -174,17 +181,17 @@ public class AlgorithmService {
 		for (String header : headersForAlternativeMatrix) {
 			System.out.print(String.format("%-7s", header));
 		}
-		System.out.print(String.format("%-7s %-7s", "W", "w"));
+		System.out.print(String.format("%-7s %-7s", "W", "v"));
 		System.out.println();
 	}
 
 	public void calcQualityIndicator() {
 		List<Double> qualityIndicators = new ArrayList<>();
-		for (int k = 0; k<alternativeMatrix.length; k++) {
+		for (int k = 0; k < amountOfCriteria; k++) {
 			double qualityIndicator = 0;
-			for (int i= 0; i < alternativeMatrix.length; i++) {
+			for (int i = 0; i < criteriaMatrix.length; i++) {
 				qualityIndicator += criteriaMatrix[i][criteriaMatrix.length - 1].getWeightOfCriteria()
-						* alternativeMatrix[i][k][criteriaMatrix.length - 1].getWeightOfCriteria();
+						* alternativeMatrix[i][k][alternativeMatrix.length - 1].getWeightOfCriteria();
 			}
 			qualityIndicators.add(qualityIndicator);
 		}
